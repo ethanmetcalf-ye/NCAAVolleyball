@@ -1,0 +1,32 @@
+{
+  "season": "2025",
+  "source_season_label": "2025-26",
+  "postseason_start": "2025-12-04",
+  "conference_tournaments": [
+    {
+      "conference": "SEC",
+      "venue": "Enmarket Arena (Savannah, GA)",
+      "start": "2025-11-21",
+      "end": "2025-11-25"
+    }
+  ],
+  "known_anomalies": {
+    "illegal_set_scores": {
+      "6411406": "Set 3 recorded as 24-25 (Long Beach St. vs UCLA, 2025-09-01), as reported by the source."
+    }
+  },
+  "expected_counts": {
+    "teams": 282,
+    "power4_teams": 67,
+    "matches": 1273,
+    "match_sets": 4723,
+    "team_match_stats": 2546,
+    "players": 3748,
+    "player_match_stats": 28675,
+    "matches_by_season_phase": {"conference_tournament": 15, "postseason": 60, "regular": 1198},
+    "matches_by_site_type": {"home": 946, "neutral": 161, "unknown": 166},
+    "game_spine": 630,
+    "game_spine_by_conference": {"ACC": 180, "Big 12": 135, "Big Ten": 180, "SEC": 135},
+    "champion": "Texas A&M"
+  }
+}

@@ -1,5 +1,2 @@
-playwright
-beautifulsoup4
-lxml
-pandas
-pyarrow
+pandas==3.0.5
+numpy==2.5.2
