@@ -6,17 +6,17 @@ exploration into a full ranked comparison across stats. Prints a report;
 also called by src/dashboard/build.py to feed the dashboard's insights
 panel.
 
-Run from repo root, after src/pipeline/features.py:
+Run from repo root, after src/pipeline/build.py:
     source .venv/bin/activate
-    python3 -m src.pipeline.correlations
+    python3 -m src.analysis.correlations
 """
 
-import sqlite3
 from pathlib import Path
 
 import pandas as pd
 
-DB_PATH = Path(__file__).resolve().parents[2] / "data" / "processed" / "volleyball.db"
+from src import db
+from src.config import DB_PATH
 
 STAT_LABELS = {
     "hit_pct": "Hitting %",
@@ -32,7 +32,7 @@ STAT_LABELS = {
 
 
 def compute(db_path: Path = DB_PATH) -> pd.DataFrame:
-    conn = sqlite3.connect(db_path)
+    conn = db.connect(db_path)
     df = pd.read_sql("SELECT * FROM team_match_features", conn)
     conn.close()
 

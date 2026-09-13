@@ -1,157 +1,194 @@
 """Sanity-check the processed SQLite store.
 
-Not exhaustive -- checks the things most likely to signal a real
-normalization bug: referential integrity, duplicate keys, hitting-pct
-arithmetic, and a standings reconstruction spot-check against a known
-result (Pittsburgh won the 2025 D-I championship, 30-4).
+Two kinds of checks, on purpose:
+  - Structural invariants: hold for any season or scope (box-score
+    arithmetic, set scores, referential integrity, view consistency). These
+    should never need editing when data is added.
+  - Dataset expectations: row counts pinned in
+    data/reference/season_{SEASON}.json["expected_counts"]. These are
+    regression guards for one specific dataset and *should* fail when the
+    scope changes -- update the JSON deliberately when that happens.
+
+Exits non-zero if any check fails.
 
 Run from repo root:
     source .venv/bin/activate
     python3 -m src.pipeline.validate
 """
 
+import json
 import sqlite3
+import sys
 from pathlib import Path
 
-DB_PATH = Path(__file__).resolve().parents[2] / "data" / "processed" / "volleyball.db"
+from src import db
+from src.config import DB_PATH, REFERENCE_DIR, SEASON
+
+# Team totals must equal the sum of the team's player rows for these columns.
+# Reception attempts/errors are excluded: the source attributes some of them
+# to an unlisted "TEAM" line inconsistently, so they don't reconcile for ~25%
+# of team-matches.
+RECONCILED_COLUMNS = [
+    "kills", "errors", "total_attacks", "assists", "aces", "service_errors", "digs",
+    "block_solos", "block_assists", "block_errors", "ball_handling_errors",
+]
 
 
-def run():
-    conn = sqlite3.connect(DB_PATH)
+def run(db_path: Path = DB_PATH, reference_dir: Path = REFERENCE_DIR, season: str = SEASON) -> list[str]:
+    season_config = json.loads((reference_dir / f"season_{season}.json").read_text())
+    conn = db.connect(db_path)
     conn.row_factory = sqlite3.Row
     issues = []
 
-    def check(label, query, expect_empty=True):
-        rows = conn.execute(query).fetchall()
-        bad = bool(rows) if expect_empty else not rows
-        status = "FAIL" if bad else "ok"
-        print(f"[{status}] {label}" + (f" ({len(rows)} rows)" if rows else ""))
-        if bad:
+    def check(label, query, params=()):
+        """Fail if the query returns any rows."""
+        rows = conn.execute(query, params).fetchall()
+        print(f"[{'FAIL' if rows else 'ok'}] {label}" + (f" ({len(rows)} rows)" if rows else ""))
+        if rows:
             issues.append(label)
             for r in rows[:5]:
                 print("   ", dict(r))
-        return rows
 
-    check("duplicate contest_id in matches",
-          "SELECT contest_id, COUNT(*) c FROM matches GROUP BY contest_id HAVING c > 1")
+    def expect(label, actual, expected):
+        ok = actual == expected
+        print(f"[{'ok' if ok else 'FAIL'}] {label}: {actual}" + ("" if ok else f" (expected {expected})"))
+        if not ok:
+            issues.append(label)
 
-    check("duplicate (contest_id, team_id) in team_match_stats",
-          "SELECT contest_id, team_id, COUNT(*) c FROM team_match_stats "
-          "GROUP BY contest_id, team_id HAVING c > 1")
+    def scalar(query):
+        return conn.execute(query).fetchone()[0]
 
-    check("duplicate (contest_id, player_id) in player_match_stats",
-          "SELECT contest_id, player_id, COUNT(*) c FROM player_match_stats "
-          "GROUP BY contest_id, player_id HAVING c > 1")
+    print("-- structural invariants")
 
-    check("matches referencing unknown team_id",
-          "SELECT contest_id, away_team_id, home_team_id FROM matches "
-          "WHERE away_team_id NOT IN (SELECT team_id FROM teams) "
-          "   OR home_team_id NOT IN (SELECT team_id FROM teams)")
+    check("foreign key violations", "PRAGMA foreign_key_check")
 
-    check("team_match_stats rows without a matching match",
-          "SELECT contest_id, team_id FROM team_match_stats "
-          "WHERE contest_id NOT IN (SELECT contest_id FROM matches)")
-
-    check("matches missing one or both team_match_stats rows",
+    check("match without exactly 2 team_match_stats rows",
           "SELECT m.contest_id, COUNT(t.team_id) n FROM matches m "
           "LEFT JOIN team_match_stats t ON t.contest_id = m.contest_id "
           "GROUP BY m.contest_id HAVING n != 2")
 
-    check("player_match_stats rows with unknown player_id",
-          "SELECT contest_id, player_id FROM player_match_stats "
-          "WHERE player_id NOT IN (SELECT player_id FROM players)")
+    check("team_match_stats team not playing in that match",
+          "SELECT t.contest_id, t.team_id FROM team_match_stats t JOIN matches m USING (contest_id) "
+          "WHERE t.team_id NOT IN (m.home_team_id, m.away_team_id)")
 
-    check("hit_pct arithmetic mismatch in team_match_stats",
-          "SELECT contest_id, team_id, kills, errors, total_attacks, hit_pct FROM team_match_stats "
-          "WHERE total_attacks > 0 "
-          "  AND ABS(hit_pct - (CAST(kills AS REAL) - errors) / total_attacks) > 0.001")
+    check("player_match_stats team not playing in that match",
+          "SELECT p.contest_id, p.player_id FROM player_match_stats p JOIN matches m USING (contest_id) "
+          "WHERE p.team_id NOT IN (m.home_team_id, m.away_team_id)")
 
-    check("hit_pct arithmetic mismatch in player_match_stats",
-          "SELECT contest_id, player_id, kills, errors, total_attacks, hit_pct FROM player_match_stats "
-          "WHERE total_attacks > 0 "
-          "  AND ABS(hit_pct - (CAST(kills AS REAL) - errors) / total_attacks) > 0.001")
-
-    check("match sets_won doesn't sum to num_sets",
-          "SELECT contest_id FROM matches WHERE away_sets_won + home_sets_won != num_sets")
-
-    check("winner didn't reach 3 sets (best-of-5, no 5-set ties allowed)",
-          "SELECT contest_id, away_sets_won, home_sets_won FROM matches "
-          "WHERE MAX(away_sets_won, home_sets_won) != 3")
-
-    # Standings spot-check: whoever won the championship final (highest-date
-    # match in the dataset) should have one of the best records in the
-    # league -- a soft plausibility check, not a hardcoded number, since the
-    # actual finalists/champion aren't something to assume from memory.
-    final = conn.execute(
-        "SELECT contest_id, date, away_team_id, home_team_id, away_sets_won, home_sets_won "
-        "FROM matches ORDER BY date DESC LIMIT 1"
-    ).fetchone()
-    champ_id = final["away_team_id"] if final["away_sets_won"] > final["home_sets_won"] else final["home_team_id"]
-    champ_name = conn.execute("SELECT name FROM teams WHERE team_id=?", (champ_id,)).fetchone()["name"]
-    record = conn.execute(
-        "SELECT "
-        "  SUM(CASE WHEN (away_team_id=? AND away_sets_won>home_sets_won) "
-        "        OR (home_team_id=? AND home_sets_won>away_sets_won) THEN 1 ELSE 0 END) AS wins, "
-        "  SUM(CASE WHEN (away_team_id=? AND away_sets_won<home_sets_won) "
-        "        OR (home_team_id=? AND home_sets_won<away_sets_won) THEN 1 ELSE 0 END) AS losses "
-        "FROM matches WHERE away_team_id=? OR home_team_id=?",
-        (champ_id, champ_id, champ_id, champ_id, champ_id, champ_id),
-    ).fetchone()
-    win_pct = record["wins"] / (record["wins"] + record["losses"])
-    status = "ok" if win_pct > 0.80 else "FAIL"
-    print(f"[{status}] Championship final ({final['date']}) winner {champ_name}: "
-          f"{record['wins']}-{record['losses']} ({win_pct:.0%}) -- plausible for a champion" if win_pct > 0.80
-          else f"[{status}] Championship winner {champ_name} has an implausible record: "
-               f"{record['wins']}-{record['losses']}")
-    if win_pct <= 0.80:
-        issues.append("Champion win% implausible")
-
-    feature_tables_exist = conn.execute(
-        "SELECT COUNT(*) c FROM sqlite_master WHERE type='table' AND name='team_match_features'"
-    ).fetchone()["c"]
-    if feature_tables_exist:
-        check("team_match_features row count != 2x matches",
-              "SELECT 1 WHERE (SELECT COUNT(*) FROM team_match_features) "
-              "  != (SELECT COUNT(*) FROM matches) * 2")
-
-        check("team_match_features has non-finite hit_pct/error_pct",
-              "SELECT contest_id, team_id FROM team_match_features "
-              "WHERE hit_pct = 'inf' OR hit_pct = '-inf' OR error_pct = 'inf' OR error_pct = '-inf'")
-
-        check("team_season_stats win_pct outside [0,1]",
-              "SELECT team_id, win_pct FROM team_season_stats WHERE win_pct < 0 OR win_pct > 1")
-
-        check("team_season_stats missing a team present in team_match_stats",
-              "SELECT DISTINCT team_id FROM team_match_stats "
-              "WHERE team_id NOT IN (SELECT team_id FROM team_season_stats)")
-    else:
-        print("[skip] team_match_features/team_season_stats not built yet "
-              "(run src/pipeline/features.py)")
-
-    player_features_exist = conn.execute(
-        "SELECT COUNT(*) c FROM sqlite_master WHERE type='table' AND name='player_season_stats'"
-    ).fetchone()["c"]
-    if player_features_exist:
-        check("duplicate player_id in player_season_stats",
-              "SELECT player_id, COUNT(*) c FROM player_season_stats GROUP BY player_id HAVING c > 1")
-
-        check("player_season_stats row count != players count",
-              "SELECT 1 WHERE (SELECT COUNT(*) FROM player_season_stats) "
-              "  != (SELECT COUNT(*) FROM players)")
-
-        check("player_season_stats hit_pct arithmetic mismatch",
-              "SELECT player_id, kills, errors, total_attacks, hit_pct FROM player_season_stats "
+    for table, key in [("team_match_stats", "team_id"), ("player_match_stats", "player_id")]:
+        check(f"hit_pct arithmetic mismatch in {table}",
+              f"SELECT contest_id, {key}, kills, errors, total_attacks, hit_pct FROM {table} "
               "WHERE total_attacks > 0 "
               "  AND ABS(hit_pct - (CAST(kills AS REAL) - errors) / total_attacks) > 0.001")
-    else:
-        print("[skip] player_season_stats not built yet (run src/pipeline/player_features.py)")
+        check(f"points != kills + aces + block_solos + 0.5*block_assists in {table}",
+              f"SELECT contest_id, {key}, points FROM {table} "
+              "WHERE ABS(points - (kills + aces + block_solos + 0.5 * block_assists)) > 0.01")
 
-    # Rough shape checks.
-    n_matches = conn.execute("SELECT COUNT(*) c FROM matches").fetchone()["c"]
-    n_players = conn.execute("SELECT COUNT(*) c FROM players").fetchone()["c"]
-    n_teams = conn.execute("SELECT COUNT(*) c FROM teams").fetchone()["c"]
-    n_p4 = conn.execute("SELECT COUNT(*) c FROM teams WHERE is_power4=1").fetchone()["c"]
-    print(f"\n{n_matches} matches, {n_teams} teams ({n_p4} Power4), {n_players} players")
+    check("team totals don't reconcile with sum of player rows",
+          "SELECT t.contest_id, t.team_id FROM team_match_stats t JOIN ("
+          "  SELECT contest_id, team_id, "
+          + ", ".join(f"SUM({c}) AS {c}" for c in RECONCILED_COLUMNS)
+          + "  FROM player_match_stats GROUP BY contest_id, team_id) p USING (contest_id, team_id) "
+          "WHERE " + " OR ".join(f"t.{c} != p.{c}" for c in RECONCILED_COLUMNS))
+
+    check("team sets played != match num_sets",
+          "SELECT t.contest_id, t.team_id FROM team_match_stats t JOIN matches m USING (contest_id) "
+          "WHERE t.sets != m.num_sets")
+
+    check("match sets_won doesn't sum to num_sets, or winner didn't reach 3",
+          "SELECT contest_id FROM matches "
+          "WHERE away_sets_won + home_sets_won != num_sets OR MAX(away_sets_won, home_sets_won) != 3")
+
+    check("match_sets rows != num_sets, or set winners don't match sets_won",
+          "SELECT m.contest_id FROM matches m JOIN match_sets s USING (contest_id) "
+          "GROUP BY m.contest_id "
+          "HAVING COUNT(*) != m.num_sets "
+          "    OR SUM(s.home_points > s.away_points) != m.home_sets_won "
+          "    OR SUM(s.away_points > s.home_points) != m.away_sets_won")
+
+    # Allowlisted source errors are skipped. Passed as a JSON array so an
+    # empty allowlist works: a `NOT IN (NULL)` placeholder evaluates to NULL
+    # and would silently skip every row.
+    known_bad_sets = list(season_config["known_anomalies"].get("illegal_set_scores", {}))
+    check("illegal set score (sets 1-4 to 25, set 5 to 15, win by 2; overtime ends at +2)",
+          "SELECT contest_id, set_number, away_points, home_points FROM match_sets "
+          f"WHERE contest_id NOT IN (SELECT value FROM json_each(?)) AND ("
+          "  ABS(home_points - away_points) < 2 "
+          "  OR MAX(home_points, away_points) < CASE WHEN set_number = 5 THEN 15 ELSE 25 END "
+          "  OR (MAX(home_points, away_points) > CASE WHEN set_number = 5 THEN 15 ELSE 25 END "
+          "      AND ABS(home_points - away_points) != 2))",
+          (json.dumps(known_bad_sets),))
+
+    check("home or away team playing itself",
+          "SELECT contest_id FROM matches WHERE home_team_id = away_team_id")
+
+    check("Power4-hosted match with unknown site_type",
+          "SELECT m.contest_id FROM matches m JOIN teams t ON t.team_id = m.home_team_id "
+          "WHERE t.is_power4 = 1 AND m.site_type IS NULL")
+
+    check("host_team_id not one of the two teams",
+          "SELECT contest_id FROM matches WHERE host_team_id NOT IN (home_team_id, away_team_id)")
+
+    check("conference_tournament phase on a non-conference match",
+          "SELECT contest_id FROM matches WHERE season_phase = 'conference_tournament' AND is_conference_match = 0")
+
+    check("is_conference_match inconsistent with teams.conference",
+          "SELECT m.contest_id FROM matches m "
+          "JOIN teams h ON h.team_id = m.home_team_id JOIN teams a ON a.team_id = m.away_team_id "
+          "WHERE m.is_conference_match != COALESCE(h.is_power4 AND a.is_power4 AND h.conference = a.conference, 0)")
+
+    check("players with a position but no position_group",
+          "SELECT player_id, primary_position FROM players "
+          "WHERE primary_position IS NOT NULL AND position_group IS NULL")
+
+    check("team_match_features: not exactly one winner per match",
+          "SELECT contest_id FROM team_match_features GROUP BY contest_id "
+          "HAVING COUNT(*) != 2 OR SUM(won) != 1")
+
+    check("team_season_stats: wins + losses != matches_played, or win_pct outside [0, 1]",
+          "SELECT team_id FROM team_season_stats "
+          "WHERE wins + losses != matches_played OR win_pct < 0 OR win_pct > 1")
+
+    check("game_spine: home side isn't the host at a home-site match",
+          "SELECT g.contest_id FROM game_spine g JOIN matches m USING (contest_id) "
+          "WHERE g.site_type = 'home' AND m.host_team_id != g.home_team_id")
+
+    check("game_spine: a team appears under 2 conferences",
+          "SELECT team_id FROM ("
+          "  SELECT home_team_id AS team_id, conference FROM game_spine "
+          "  UNION SELECT away_team_id, conference FROM game_spine) "
+          "GROUP BY team_id HAVING COUNT(DISTINCT conference) > 1")
+
+    print(f"\n-- dataset expectations (season_{season}.json)")
+    expected = season_config["expected_counts"]
+    actual = {
+        "teams": scalar("SELECT COUNT(*) FROM teams"),
+        "power4_teams": scalar("SELECT COUNT(*) FROM teams WHERE is_power4 = 1"),
+        "matches": scalar("SELECT COUNT(*) FROM matches"),
+        "match_sets": scalar("SELECT COUNT(*) FROM match_sets"),
+        "team_match_stats": scalar("SELECT COUNT(*) FROM team_match_stats"),
+        "players": scalar("SELECT COUNT(*) FROM players"),
+        "player_match_stats": scalar("SELECT COUNT(*) FROM player_match_stats"),
+        "matches_by_season_phase": {r[0]: r[1] for r in conn.execute(
+            "SELECT season_phase, COUNT(*) FROM matches GROUP BY 1 ORDER BY 1")},
+        "matches_by_site_type": {(r[0] or "unknown"): r[1] for r in conn.execute(
+            "SELECT site_type, COUNT(*) FROM matches GROUP BY 1 ORDER BY 1")},
+        "game_spine": scalar("SELECT COUNT(*) FROM game_spine"),
+        "game_spine_by_conference": {r[0]: r[1] for r in conn.execute(
+            "SELECT conference, COUNT(*) FROM game_spine GROUP BY 1 ORDER BY 1")},
+        # Winner of the season's last match (the championship final). Guards
+        # the date parsing and season_phase logic end to end.
+        "champion": scalar(
+            "SELECT t.name FROM team_match_features f JOIN teams t USING (team_id) "
+            "WHERE f.won = 1 AND f.season_phase = 'postseason' "
+            "ORDER BY f.match_date DESC, f.contest_id DESC LIMIT 1"),
+    }
+    for key, value in actual.items():
+        expect(key, value, expected.get(key))
+
+    home_win_rate = scalar("SELECT AVG(home_won) FROM game_spine WHERE site_type = 'home'")
+    if home_win_rate is not None:
+        print(f"\n[info] game_spine home win rate at true home sites: {home_win_rate:.4f}")
 
     print(f"\n{'PASSED' if not issues else f'{len(issues)} CHECK(S) FAILED'}")
     conn.close()
@@ -159,4 +196,4 @@ def run():
 
 
 if __name__ == "__main__":
-    run()
+    sys.exit(1 if run() else 0)

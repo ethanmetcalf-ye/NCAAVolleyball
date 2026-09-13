@@ -1,4 +1,4 @@
-"""Build the Phase 3 team-level dashboard: a self-contained HTML file.
+"""Build the team-level dashboard: a self-contained HTML file.
 
 Pulls standings/leaderboard and season-trend data out of
 data/processed/volleyball.db, embeds it as JSON into src/dashboard/template.html,
@@ -6,73 +6,65 @@ and writes src/dashboard/dashboard.html. No server, no external data
 fetches at view time (Chart.js loads from a CDN, everything else is
 embedded).
 
-Run from repo root, after src/pipeline/build.py and features.py:
+Run from repo root, after src/pipeline/build.py:
     source .venv/bin/activate
     python3 -m src.dashboard.build
 """
 
 import json
 import sqlite3
-import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
-DB_PATH = ROOT / "data" / "processed" / "volleyball.db"
+from src import db
+from src.analysis.correlations import compute as compute_correlations
+from src.config import DB_PATH
+
 TEMPLATE_PATH = Path(__file__).parent / "template.html"
 OUTPUT_PATH = Path(__file__).parent / "dashboard.html"
 
-sys.path.insert(0, str(ROOT))
-from src.pipeline.correlations import compute as compute_correlations  # noqa: E402
 
-
-def fetch_data(conn: sqlite3.Connection) -> dict:
+def fetch_data(conn: sqlite3.Connection, db_path: Path) -> dict:
     conn.row_factory = sqlite3.Row
 
     teams = [dict(r) for r in conn.execute(
-        "SELECT team_id, name, conference FROM teams WHERE is_power4=1 ORDER BY conference, name"
+        "SELECT team_id, name, conference FROM teams WHERE is_power4 = 1 ORDER BY conference, name"
     )]
 
+    # Aliases keep the template's field names; the template is reworked in the dashboard phase.
     standings = [dict(r) for r in conn.execute(
-        "SELECT s.team_id, te.name, te.conference, s.matches_played, s.wins, s.losses, "
-        "  s.win_pct, s.avg_hit_pct, s.avg_error_pct, s.kills_per_set, s.digs_per_set, "
-        "  s.blocks_per_set, s.aces_per_set, s.strength_of_schedule "
-        "FROM team_season_stats s JOIN teams te ON te.team_id = s.team_id "
-        "WHERE te.is_power4 = 1 ORDER BY s.win_pct DESC"
+        "SELECT team_id, name, conference, matches_played, wins, losses, win_pct, "
+        "  hit_pct AS avg_hit_pct, error_pct AS avg_error_pct, kills_per_set, digs_per_set, "
+        "  blocks_per_set, aces_per_set, strength_of_schedule "
+        "FROM team_season_stats WHERE is_power4 = 1 ORDER BY win_pct DESC"
     )]
 
     players = [dict(r) for r in conn.execute(
-        "SELECT p.player_id, p.name, p.primary_position AS position, "
-        "  te.team_id, te.name AS team_name, te.conference, "
-        "  s.matches_played, s.sets_played, s.kills, s.errors, s.total_attacks, s.hit_pct, "
-        "  s.assists, s.aces, s.service_errors, s.digs, "
-        "  (s.block_solos + s.block_assists) AS blocks, s.points, "
-        "  s.kills_per_set, s.digs_per_set, s.blocks_per_set, s.aces_per_set, "
-        "  s.assists_per_set, s.points_per_set "
-        "FROM player_season_stats s "
-        "JOIN players p ON p.player_id = s.player_id "
-        "JOIN teams te ON te.team_id = p.primary_team_id "
-        "WHERE te.is_power4 = 1"
+        "SELECT player_id, name, position, team_id, team_name, conference, "
+        "  matches_played, sets_played, kills, errors, total_attacks, hit_pct, "
+        "  assists, aces, service_errors, digs, blocks, points, "
+        "  kills_per_set, digs_per_set, blocks_per_set, aces_per_set, "
+        "  assists_per_set, points_per_set "
+        "FROM player_season_stats WHERE is_power4 = 1"
     )]
 
     trends = [dict(r) for r in conn.execute(
-        "SELECT f.team_id, f.date, f.won, f.hit_pct, f.error_pct, f.kills_per_set, "
+        "SELECT f.team_id, f.match_date AS date, f.won, f.hit_pct, f.error_pct, f.kills_per_set, "
         "  f.digs_per_set, f.blocks_per_set, f.aces_per_set, f.point_differential, "
         "  opp.name AS opponent_name "
         "FROM team_match_features f "
+        "JOIN teams t ON t.team_id = f.team_id AND t.is_power4 = 1 "
         "JOIN teams opp ON opp.team_id = f.opponent_team_id "
-        "WHERE f.team_id IN (SELECT team_id FROM teams WHERE is_power4 = 1) "
-        "ORDER BY f.team_id, f.date"
+        "ORDER BY f.team_id, f.match_date, f.contest_id"
     )]
 
     meta = conn.execute(
-        "SELECT COUNT(*) n_matches, MIN(date) start_date, MAX(date) end_date FROM matches"
+        "SELECT COUNT(*) n_matches, MIN(match_date) start_date, MAX(match_date) end_date FROM matches"
     ).fetchone()
     league_avg_hit_pct = conn.execute(
-        "SELECT AVG(win_pct) w, AVG(avg_hit_pct) h FROM team_season_stats s "
-        "JOIN teams te ON te.team_id = s.team_id WHERE te.is_power4 = 1"
-    ).fetchone()
+        "SELECT AVG(hit_pct) FROM team_season_stats WHERE is_power4 = 1"
+    ).fetchone()[0]
 
-    correlations = compute_correlations(DB_PATH).to_dict(orient="records")
+    correlations = compute_correlations(db_path).to_dict(orient="records")
 
     return {
         "teams": teams,
@@ -82,26 +74,26 @@ def fetch_data(conn: sqlite3.Connection) -> dict:
         "correlations": correlations,
         "meta": {
             "n_matches": meta["n_matches"],
-            "start_date": meta["start_date"][:10],
-            "end_date": meta["end_date"][:10],
+            "start_date": meta["start_date"],
+            "end_date": meta["end_date"],
             "n_teams": len(teams),
-            "league_avg_hit_pct": league_avg_hit_pct["h"],
+            "league_avg_hit_pct": league_avg_hit_pct,
         },
     }
 
 
-def build():
-    conn = sqlite3.connect(DB_PATH)
-    data = fetch_data(conn)
+def build(db_path: Path = DB_PATH, output_path: Path = OUTPUT_PATH):
+    conn = db.connect(db_path)
+    data = fetch_data(conn, db_path)
     conn.close()
 
     template = TEMPLATE_PATH.read_text()
     html = template.replace("/*__DASHBOARD_DATA__*/", json.dumps(data))
-    OUTPUT_PATH.write_text(html)
+    output_path.write_text(html)
 
     print(f"{len(data['teams'])} teams, {len(data['standings'])} standings rows, "
           f"{len(data['trends'])} trend rows, {len(data['players'])} players")
-    print(f"Wrote {OUTPUT_PATH}")
+    print(f"Wrote {output_path}")
 
 
 if __name__ == "__main__":

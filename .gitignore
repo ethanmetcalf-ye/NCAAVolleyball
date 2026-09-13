@@ -8,5 +8,7 @@ __pycache__/
 src/scraper/
 data/html_cache/
 data/raw/
+data/processed/*.staging.db
+data/processed/*.tmp
 .pytest_cache/
 .coverage

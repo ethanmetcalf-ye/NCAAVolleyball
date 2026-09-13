@@ -2,336 +2,552 @@
   {
     "team_id": "604763",
     "name": "Boston College",
-    "conference": "ACC"
+    "conference": "ACC",
+    "home_venues": [
+      "Connell Recreation Center (Chestnut Hill, MA)"
+    ]
   },
   {
     "team_id": "604779",
     "name": "California",
-    "conference": "ACC"
+    "conference": "ACC",
+    "home_venues": [
+      "Haas Pavilion (Berkeley, CA)"
+    ]
   },
   {
     "team_id": "604791",
     "name": "Clemson",
-    "conference": "ACC"
+    "conference": "ACC",
+    "home_venues": [
+      "Jervey Gymnasium (Clemson, SC)"
+    ]
   },
   {
     "team_id": "604805",
     "name": "Duke",
-    "conference": "ACC"
+    "conference": "ACC",
+    "home_venues": [
+      "Cameron Indoor Stadium (Durham, NC)"
+    ]
   },
   {
     "team_id": "604817",
     "name": "Florida St.",
-    "conference": "ACC"
+    "conference": "ACC",
+    "home_venues": [
+      "Tully Gymnasium (Tallahassee, FL)"
+    ]
   },
   {
     "team_id": "604826",
     "name": "Georgia Tech",
-    "conference": "ACC"
+    "conference": "ACC",
+    "home_venues": [
+      "O'Keefe Gym (Atlanta, GA)",
+      "McCamish Pavilion (Atlanta, GA)"
+    ]
   },
   {
     "team_id": "604862",
     "name": "Louisville",
-    "conference": "ACC"
+    "conference": "ACC",
+    "home_venues": [
+      "L&N Federal Credit Union Arena (Louisville, KY)",
+      "KFC Yum! Center (Louisville, KY)"
+    ]
   },
   {
     "team_id": "604875",
     "name": "Miami (FL)",
-    "conference": "ACC"
+    "conference": "ACC",
+    "home_venues": [
+      "James L. Knight Sports Complex (Miami, FL)",
+      "Ocean Bank Convocation Center (Miami, FL)"
+    ]
   },
   {
     "team_id": "604906",
     "name": "NC State",
-    "conference": "ACC"
+    "conference": "ACC",
+    "home_venues": [
+      "Reynolds Coliseum (Raleigh, NC)"
+    ]
   },
   {
     "team_id": "604889",
     "name": "North Carolina",
-    "conference": "ACC"
+    "conference": "ACC",
+    "home_venues": [
+      "Carmichael Arena (Chapel Hill, NC)"
+    ]
   },
   {
     "team_id": "604987",
     "name": "Notre Dame",
-    "conference": "ACC"
+    "conference": "ACC",
+    "home_venues": [
+      "Purcell Pavilion at the Joyce Center (Notre Dame, IN)"
+    ]
   },
   {
     "team_id": "605080",
     "name": "Pittsburgh",
-    "conference": "ACC"
+    "conference": "ACC",
+    "home_venues": [
+      "Fitzgerald Field House (Pittsburgh, PA)",
+      "Petersen Events Center (Pittsburgh, PA)",
+      "PPG Paints Arena (Pittsburgh, PA)"
+    ]
   },
   {
     "team_id": "605037",
     "name": "SMU",
-    "conference": "ACC"
+    "conference": "ACC",
+    "home_venues": [
+      "Moody Coliseum (Dallas, TX)"
+    ]
   },
   {
     "team_id": "604912",
     "name": "Stanford",
-    "conference": "ACC"
+    "conference": "ACC",
+    "home_venues": [
+      "Maples Pavilion (Stanford, CA)"
+    ]
   },
   {
     "team_id": "604916",
     "name": "Syracuse",
-    "conference": "ACC"
+    "conference": "ACC",
+    "home_venues": [
+      "Women's Building (Syracuse, NY)"
+    ]
   },
   {
     "team_id": "604944",
     "name": "Virginia",
-    "conference": "ACC"
+    "conference": "ACC",
+    "home_venues": [
+      "Memorial Gymnasium (Charlottesville, VA)"
+    ]
   },
   {
     "team_id": "604943",
     "name": "Virginia Tech",
-    "conference": "ACC"
+    "conference": "ACC",
+    "home_venues": [
+      "Cassell Coliseum (Blacksburg, VA)"
+    ]
   },
   {
     "team_id": "604945",
     "name": "Wake Forest",
-    "conference": "ACC"
+    "conference": "ACC",
+    "home_venues": [
+      "Reynolds Gym (Winston-Salem, NC)"
+    ]
   },
   {
     "team_id": "604751",
     "name": "Arizona",
-    "conference": "Big 12"
+    "conference": "Big 12",
+    "home_venues": [
+      "McKale Center (Tucson, AZ)"
+    ]
   },
   {
     "team_id": "605052",
     "name": "Arizona St.",
-    "conference": "Big 12"
+    "conference": "Big 12",
+    "home_venues": [
+      "Desert Financial Arena (Tempe, AZ)"
+    ]
   },
   {
     "team_id": "604766",
     "name": "BYU",
-    "conference": "Big 12"
+    "conference": "Big 12",
+    "home_venues": [
+      "Smith Fieldhouse (Provo, UT)"
+    ]
   },
   {
     "team_id": "604759",
     "name": "Baylor",
-    "conference": "Big 12"
+    "conference": "Big 12",
+    "home_venues": [
+      "Ferrell Center (Waco, TX)"
+    ]
   },
   {
     "team_id": "604789",
     "name": "Cincinnati",
-    "conference": "Big 12"
+    "conference": "Big 12",
+    "home_venues": [
+      "Fifth Third Arena (Cincinnati, OH)"
+    ]
   },
   {
     "team_id": "604793",
     "name": "Colorado",
-    "conference": "Big 12"
+    "conference": "Big 12",
+    "home_venues": [
+      "CU Events Center (Boulder, CO)"
+    ]
   },
   {
     "team_id": "604835",
     "name": "Houston",
-    "conference": "Big 12"
+    "conference": "Big 12",
+    "home_venues": [
+      "Fertitta Center (Houston, TX)"
+    ]
   },
   {
     "team_id": "604847",
     "name": "Iowa St.",
-    "conference": "Big 12"
+    "conference": "Big 12",
+    "home_venues": [
+      "James H. Hilton Coliseum (Ames, IA)"
+    ]
   },
   {
     "team_id": "604853",
     "name": "Kansas",
-    "conference": "Big 12"
+    "conference": "Big 12",
+    "home_venues": [
+      "Horejsi Family Volleyball Arena (Lawrence, KS)"
+    ]
   },
   {
     "team_id": "604852",
     "name": "Kansas St.",
-    "conference": "Big 12"
+    "conference": "Big 12",
+    "home_venues": [
+      "Morgan Family Arena (Manhattan, KS)"
+    ]
   },
   {
     "team_id": "604924",
     "name": "TCU",
-    "conference": "Big 12"
+    "conference": "Big 12",
+    "home_venues": [
+      "Ed and Rae Schollmaier Arena (Fort Worth, TX)"
+    ]
   },
   {
     "team_id": "604926",
     "name": "Texas Tech",
-    "conference": "Big 12"
+    "conference": "Big 12",
+    "home_venues": [
+      "United Supermarkets Arena (Lubbock, TX)"
+    ]
   },
   {
     "team_id": "604787",
     "name": "UCF",
-    "conference": "Big 12"
+    "conference": "Big 12",
+    "home_venues": [
+      "The Venue at UCF (Orlando, FL)"
+    ]
   },
   {
     "team_id": "604939",
     "name": "Utah",
-    "conference": "Big 12"
+    "conference": "Big 12",
+    "home_venues": [
+      "Jon M. Huntsman Center (Salt Lake City, UT)"
+    ]
   },
   {
     "team_id": "604949",
     "name": "West Virginia",
-    "conference": "Big 12"
+    "conference": "Big 12",
+    "home_venues": [
+      "WVU Coliseum (Morgantown, WV)",
+      "Hope Coliseum (Morgantown, WV)"
+    ]
   },
   {
     "team_id": "604840",
     "name": "Illinois",
-    "conference": "Big Ten"
+    "conference": "Big Ten",
+    "home_venues": [
+      "Huff Hall (Champaign, IL)"
+    ]
   },
   {
     "team_id": "604843",
     "name": "Indiana",
-    "conference": "Big Ten"
+    "conference": "Big Ten",
+    "home_venues": [
+      "Wilkinson Hall (Bloomington, IN)"
+    ]
   },
   {
     "team_id": "604844",
     "name": "Iowa",
-    "conference": "Big Ten"
+    "conference": "Big Ten",
+    "home_venues": [
+      "Xtream Arena (Coralville, IA)",
+      "Carver-Hawkeye Arena (Iowa City, IA)"
+    ]
   },
   {
     "team_id": "604869",
     "name": "Maryland",
-    "conference": "Big Ten"
+    "conference": "Big Ten",
+    "home_venues": [
+      "XFINITY Center (College Park, MD)"
+    ]
   },
   {
     "team_id": "604877",
     "name": "Michigan",
-    "conference": "Big Ten"
+    "conference": "Big Ten",
+    "home_venues": [
+      "Crisler Center (Ann Arbor, MI)",
+      "Cliff Keen Arena (Ann Arbor, MI)"
+    ]
   },
   {
     "team_id": "604876",
     "name": "Michigan St.",
-    "conference": "Big Ten"
+    "conference": "Big Ten",
+    "home_venues": [
+      "Breslin Events Center (East Lansing, MI)",
+      "Jenison Field House (East Lansing, MI)"
+    ]
   },
   {
     "team_id": "604879",
     "name": "Minnesota",
-    "conference": "Big Ten"
+    "conference": "Big Ten",
+    "home_venues": [
+      "Maturi Pavilion (Minneapolis, MN)"
+    ]
   },
   {
     "team_id": "604893",
     "name": "Nebraska",
-    "conference": "Big Ten"
+    "conference": "Big Ten",
+    "home_venues": [
+      "Bob Devaney Sports Center (Lincoln, NE)",
+      "Pinnacle Bank Arena (Lincoln, NE)"
+    ]
   },
   {
     "team_id": "604986",
     "name": "Northwestern",
-    "conference": "Big Ten"
+    "conference": "Big Ten",
+    "home_venues": [
+      "Welsh-Ryan Arena (Evanston, IL)"
+    ]
   },
   {
     "team_id": "604989",
     "name": "Ohio St.",
-    "conference": "Big Ten"
+    "conference": "Big Ten",
+    "home_venues": [
+      "Covelli Center (Columbus, OH)"
+    ]
   },
   {
     "team_id": "604994",
     "name": "Oregon",
-    "conference": "Big Ten"
+    "conference": "Big Ten",
+    "home_venues": [
+      "Matthew Knight Arena (Eugene, OR)"
+    ]
   },
   {
     "team_id": "605079",
     "name": "Penn St.",
-    "conference": "Big Ten"
+    "conference": "Big Ten",
+    "home_venues": [
+      "Rec Hall (State College, PA)"
+    ]
   },
   {
     "team_id": "605004",
     "name": "Purdue",
-    "conference": "Big Ten"
+    "conference": "Big Ten",
+    "home_venues": [
+      "Holloway Gymnasium (West Lafayette, IN)",
+      "Mackey Arena (West Lafayette, IN)"
+    ]
   },
   {
     "team_id": "605011",
     "name": "Rutgers",
-    "conference": "Big Ten"
+    "conference": "Big Ten",
+    "home_venues": [
+      "Jersey Mike's Arena (Piscataway, NJ)",
+      "College Ave Gym (New Brunswick, NJ)"
+    ]
   },
   {
     "team_id": "605034",
     "name": "Southern California",
-    "conference": "Big Ten"
+    "conference": "Big Ten",
+    "home_venues": [
+      "Galen Center (Los Angeles, CA)"
+    ]
   },
   {
     "team_id": "604782",
     "name": "UCLA",
-    "conference": "Big Ten"
+    "conference": "Big Ten",
+    "home_venues": [
+      "Pauley Pavilion (Los Angeles, CA)"
+    ]
   },
   {
     "team_id": "604947",
     "name": "Washington",
-    "conference": "Big Ten"
+    "conference": "Big Ten",
+    "home_venues": [
+      "Alaska Airlines Arena (Seattle, WA)"
+    ]
   },
   {
     "team_id": "604955",
     "name": "Wisconsin",
-    "conference": "Big Ten"
+    "conference": "Big Ten",
+    "home_venues": [
+      "Wisconsin Field House (Madison, WI)",
+      "Kohl Center (Madison, WI)"
+    ]
   },
   {
     "team_id": "604745",
     "name": "Alabama",
-    "conference": "SEC"
+    "conference": "SEC",
+    "home_venues": [
+      "Foster Auditorium (Tuscaloosa, AL)"
+    ]
   },
   {
     "team_id": "604753",
     "name": "Arkansas",
-    "conference": "SEC"
+    "conference": "SEC",
+    "home_venues": [
+      "Barnhill Arena (Fayetteville, AR)"
+    ]
   },
   {
     "team_id": "604755",
     "name": "Auburn",
-    "conference": "SEC"
+    "conference": "SEC",
+    "home_venues": [
+      "Neville Arena (Auburn, AL)"
+    ]
   },
   {
     "team_id": "604818",
     "name": "Florida",
-    "conference": "SEC"
+    "conference": "SEC",
+    "home_venues": [
+      "Exactech Arena at Stephen C. O'Connell Center (Gainesville, FL)"
+    ]
   },
   {
     "team_id": "604827",
     "name": "Georgia",
-    "conference": "SEC"
+    "conference": "SEC",
+    "home_venues": [
+      "Stegeman Coliseum (Athens, GA)"
+    ]
   },
   {
     "team_id": "605063",
     "name": "Kentucky",
-    "conference": "SEC"
+    "conference": "SEC",
+    "home_venues": [
+      "Historic Memorial Coliseum (Lexington, KY)",
+      "Rupp Arena (Lexington, KY)"
+    ]
   },
   {
     "team_id": "604860",
     "name": "LSU",
-    "conference": "SEC"
+    "conference": "SEC",
+    "home_venues": [
+      "Maravich Assembly Center (Baton Rouge, LA)"
+    ]
   },
   {
     "team_id": "604880",
     "name": "Mississippi St.",
-    "conference": "SEC"
+    "conference": "SEC",
+    "home_venues": [
+      "Newell-Grissom Building (Starkville, MS)"
+    ]
   },
   {
     "team_id": "604883",
     "name": "Missouri",
-    "conference": "SEC"
+    "conference": "SEC",
+    "home_venues": [
+      "Hearnes Center (Columbia, MO)"
+    ]
   },
   {
     "team_id": "604991",
     "name": "Oklahoma",
-    "conference": "SEC"
+    "conference": "SEC",
+    "home_venues": [
+      "McCasland Field House (Norman, OK)"
+    ]
   },
   {
     "team_id": "604882",
     "name": "Ole Miss",
-    "conference": "SEC"
+    "conference": "SEC",
+    "home_venues": [
+      "Gillom Athletics Performance Center (Oxford, MS)"
+    ]
   },
   {
     "team_id": "605029",
     "name": "South Carolina",
-    "conference": "SEC"
+    "conference": "SEC",
+    "home_venues": [
+      "Carolina Volleyball Center (Columbia, SC)"
+    ]
   },
   {
     "team_id": "604921",
     "name": "Tennessee",
-    "conference": "SEC"
+    "conference": "SEC",
+    "home_venues": [
+      "Food City Center (Knoxville, TN)"
+    ]
   },
   {
     "team_id": "604927",
     "name": "Texas",
-    "conference": "SEC"
+    "conference": "SEC",
+    "home_venues": [
+      "Gregory Gymnasium (Austin, TX)",
+      "Moody Center (Austin, TX)"
+    ]
   },
   {
     "team_id": "604923",
     "name": "Texas A&M",
-    "conference": "SEC"
+    "conference": "SEC",
+    "home_venues": [
+      "Reed Arena (Bryan-College Station, TX)"
+    ]
   },
   {
     "team_id": "605051",
     "name": "Vanderbilt",
-    "conference": "SEC"
+    "conference": "SEC",
+    "home_venues": [
+      "Memorial Gymnasium (Nashville, TN)"
+    ]
   }
 ]
