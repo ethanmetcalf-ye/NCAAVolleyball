@@ -1,0 +1,337 @@
+[
+  {
+    "team_id": "604763",
+    "name": "Boston College",
+    "conference": "ACC"
+  },
+  {
+    "team_id": "604779",
+    "name": "California",
+    "conference": "ACC"
+  },
+  {
+    "team_id": "604791",
+    "name": "Clemson",
+    "conference": "ACC"
+  },
+  {
+    "team_id": "604805",
+    "name": "Duke",
+    "conference": "ACC"
+  },
+  {
+    "team_id": "604817",
+    "name": "Florida St.",
+    "conference": "ACC"
+  },
+  {
+    "team_id": "604826",
+    "name": "Georgia Tech",
+    "conference": "ACC"
+  },
+  {
+    "team_id": "604862",
+    "name": "Louisville",
+    "conference": "ACC"
+  },
+  {
+    "team_id": "604875",
+    "name": "Miami (FL)",
+    "conference": "ACC"
+  },
+  {
+    "team_id": "604906",
+    "name": "NC State",
+    "conference": "ACC"
+  },
+  {
+    "team_id": "604889",
+    "name": "North Carolina",
+    "conference": "ACC"
+  },
+  {
+    "team_id": "604987",
+    "name": "Notre Dame",
+    "conference": "ACC"
+  },
+  {
+    "team_id": "605080",
+    "name": "Pittsburgh",
+    "conference": "ACC"
+  },
+  {
+    "team_id": "605037",
+    "name": "SMU",
+    "conference": "ACC"
+  },
+  {
+    "team_id": "604912",
+    "name": "Stanford",
+    "conference": "ACC"
+  },
+  {
+    "team_id": "604916",
+    "name": "Syracuse",
+    "conference": "ACC"
+  },
+  {
+    "team_id": "604944",
+    "name": "Virginia",
+    "conference": "ACC"
+  },
+  {
+    "team_id": "604943",
+    "name": "Virginia Tech",
+    "conference": "ACC"
+  },
+  {
+    "team_id": "604945",
+    "name": "Wake Forest",
+    "conference": "ACC"
+  },
+  {
+    "team_id": "604751",
+    "name": "Arizona",
+    "conference": "Big 12"
+  },
+  {
+    "team_id": "605052",
+    "name": "Arizona St.",
+    "conference": "Big 12"
+  },
+  {
+    "team_id": "604766",
+    "name": "BYU",
+    "conference": "Big 12"
+  },
+  {
+    "team_id": "604759",
+    "name": "Baylor",
+    "conference": "Big 12"
+  },
+  {
+    "team_id": "604789",
+    "name": "Cincinnati",
+    "conference": "Big 12"
+  },
+  {
+    "team_id": "604793",
+    "name": "Colorado",
+    "conference": "Big 12"
+  },
+  {
+    "team_id": "604835",
+    "name": "Houston",
+    "conference": "Big 12"
+  },
+  {
+    "team_id": "604847",
+    "name": "Iowa St.",
+    "conference": "Big 12"
+  },
+  {
+    "team_id": "604853",
+    "name": "Kansas",
+    "conference": "Big 12"
+  },
+  {
+    "team_id": "604852",
+    "name": "Kansas St.",
+    "conference": "Big 12"
+  },
+  {
+    "team_id": "604924",
+    "name": "TCU",
+    "conference": "Big 12"
+  },
+  {
+    "team_id": "604926",
+    "name": "Texas Tech",
+    "conference": "Big 12"
+  },
+  {
+    "team_id": "604787",
+    "name": "UCF",
+    "conference": "Big 12"
+  },
+  {
+    "team_id": "604939",
+    "name": "Utah",
+    "conference": "Big 12"
+  },
+  {
+    "team_id": "604949",
+    "name": "West Virginia",
+    "conference": "Big 12"
+  },
+  {
+    "team_id": "604840",
+    "name": "Illinois",
+    "conference": "Big Ten"
+  },
+  {
+    "team_id": "604843",
+    "name": "Indiana",
+    "conference": "Big Ten"
+  },
+  {
+    "team_id": "604844",
+    "name": "Iowa",
+    "conference": "Big Ten"
+  },
+  {
+    "team_id": "604869",
+    "name": "Maryland",
+    "conference": "Big Ten"
+  },
+  {
+    "team_id": "604877",
+    "name": "Michigan",
+    "conference": "Big Ten"
+  },
+  {
+    "team_id": "604876",
+    "name": "Michigan St.",
+    "conference": "Big Ten"
+  },
+  {
+    "team_id": "604879",
+    "name": "Minnesota",
+    "conference": "Big Ten"
+  },
+  {
+    "team_id": "604893",
+    "name": "Nebraska",
+    "conference": "Big Ten"
+  },
+  {
+    "team_id": "604986",
+    "name": "Northwestern",
+    "conference": "Big Ten"
+  },
+  {
+    "team_id": "604989",
+    "name": "Ohio St.",
+    "conference": "Big Ten"
+  },
+  {
+    "team_id": "604994",
+    "name": "Oregon",
+    "conference": "Big Ten"
+  },
+  {
+    "team_id": "605079",
+    "name": "Penn St.",
+    "conference": "Big Ten"
+  },
+  {
+    "team_id": "605004",
+    "name": "Purdue",
+    "conference": "Big Ten"
+  },
+  {
+    "team_id": "605011",
+    "name": "Rutgers",
+    "conference": "Big Ten"
+  },
+  {
+    "team_id": "605034",
+    "name": "Southern California",
+    "conference": "Big Ten"
+  },
+  {
+    "team_id": "604782",
+    "name": "UCLA",
+    "conference": "Big Ten"
+  },
+  {
+    "team_id": "604947",
+    "name": "Washington",
+    "conference": "Big Ten"
+  },
+  {
+    "team_id": "604955",
+    "name": "Wisconsin",
+    "conference": "Big Ten"
+  },
+  {
+    "team_id": "604745",
+    "name": "Alabama",
+    "conference": "SEC"
+  },
+  {
+    "team_id": "604753",
+    "name": "Arkansas",
+    "conference": "SEC"
+  },
+  {
+    "team_id": "604755",
+    "name": "Auburn",
+    "conference": "SEC"
+  },
+  {
+    "team_id": "604818",
+    "name": "Florida",
+    "conference": "SEC"
+  },
+  {
+    "team_id": "604827",
+    "name": "Georgia",
+    "conference": "SEC"
+  },
+  {
+    "team_id": "605063",
+    "name": "Kentucky",
+    "conference": "SEC"
+  },
+  {
+    "team_id": "604860",
+    "name": "LSU",
+    "conference": "SEC"
+  },
+  {
+    "team_id": "604880",
+    "name": "Mississippi St.",
+    "conference": "SEC"
+  },
+  {
+    "team_id": "604883",
+    "name": "Missouri",
+    "conference": "SEC"
+  },
+  {
+    "team_id": "604991",
+    "name": "Oklahoma",
+    "conference": "SEC"
+  },
+  {
+    "team_id": "604882",
+    "name": "Ole Miss",
+    "conference": "SEC"
+  },
+  {
+    "team_id": "605029",
+    "name": "South Carolina",
+    "conference": "SEC"
+  },
+  {
+    "team_id": "604921",
+    "name": "Tennessee",
+    "conference": "SEC"
+  },
+  {
+    "team_id": "604927",
+    "name": "Texas",
+    "conference": "SEC"
+  },
+  {
+    "team_id": "604923",
+    "name": "Texas A&M",
+    "conference": "SEC"
+  },
+  {
+    "team_id": "605051",
+    "name": "Vanderbilt",
+    "conference": "SEC"
+  }
+]

@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NCAA Women's Volleyball — 2025 Power 4 Season</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1" integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ" crossorigin="anonymous"></script>
+<style>
+:root {
+    --bg-primary: #f8f9fa;
+    --bg-card: #ffffff;
+    --bg-header: #1a1a2e;
+    --text-primary: #212529;
+    --text-secondary: #6c757d;
+    --text-on-dark: #ffffff;
+    --color-acc: #4C72B0;
+    --color-big12: #DD8452;
+    --color-bigten: #55A868;
+    --color-sec: #C44E52;
+    --positive: #28a745;
+    --negative: #dc3545;
+    --gap: 16px;
+    --radius: 8px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.5;
+}
+.dashboard-container { max-width: 1400px; margin: 0 auto; padding: var(--gap); }
+.dashboard-header {
+    background: var(--bg-header);
+    color: var(--text-on-dark);
+    padding: 20px 24px;
+    border-radius: var(--radius);
+    margin-bottom: var(--gap);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.dashboard-header h1 { font-size: 20px; font-weight: 600; }
+.dashboard-header p { font-size: 13px; color: rgba(255,255,255,0.65); margin-top: 4px; }
+.filters { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.filter-group { display: flex; align-items: center; gap: 6px; }
+.filter-group label { font-size: 12px; color: rgba(255, 255, 255, 0.7); }
+.filter-group select {
+    padding: 6px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-on-dark);
+    font-size: 13px;
+}
+.filter-group select option { background: var(--bg-header); color: var(--text-on-dark); }
+
+.kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--gap); margin-bottom: var(--gap); }
+.kpi-card { background: var(--bg-card); border-radius: var(--radius); padding: 18px 22px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.kpi-label { font-size: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.kpi-value { font-size: 26px; font-weight: 700; }
+.kpi-sub { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+.chart-row { display: grid; grid-template-columns: 2fr 1fr; gap: var(--gap); margin-bottom: var(--gap); }
+.chart-container { background: var(--bg-card); border-radius: var(--radius); padding: 18px 22px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.chart-container h3 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.chart-container .chart-sub { font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; }
+.chart-container canvas { max-height: 300px; }
+.chart-header-row { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px; }
+.inline-filters { display: flex; gap: 8px; flex-wrap: wrap; }
+.inline-filters select { padding: 4px 8px; font-size: 12px; border-radius: 4px; border: 1px solid #ced4da; background: #fff; }
+
+.section { background: var(--bg-card); border-radius: var(--radius); padding: 20px 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: var(--gap); overflow-x: auto; }
+.section h2 { font-size: 15px; font-weight: 600; margin-bottom: 14px; }
+
+.standings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--gap); }
+.standings-group h4 { font-size: 13px; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 2px solid var(--conf-color, #4C72B0); }
+
+table.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.data-table thead th {
+    text-align: left; padding: 8px 10px; border-bottom: 2px solid #dee2e6;
+    color: var(--text-secondary); font-weight: 600; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; user-select: none; cursor: pointer;
+}
+.data-table thead th:hover { color: var(--text-primary); background: #f8f9fa; }
+.data-table tbody td { padding: 7px 10px; border-bottom: 1px solid #f0f0f0; white-space: nowrap; }
+.data-table tbody tr:hover { background: #f8f9fa; }
+.data-table tbody tr:last-child td { border-bottom: none; }
+.conf-tag { font-size: 10px; padding: 2px 6px; border-radius: 10px; color: white; font-weight: 600; }
+
+.player-leaders-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.leader-card { background: var(--bg-primary); border-radius: 6px; padding: 12px 14px; }
+.leader-card .leader-stat { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.leader-card .leader-name { font-size: 14px; font-weight: 600; }
+.leader-card .leader-detail { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+.insight-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+.insight-row:last-child { border-bottom: none; }
+.insight-label { flex: 0 0 200px; font-size: 13px; }
+.insight-bar-track { flex: 1; background: #f0f0f0; border-radius: 4px; height: 18px; position: relative; overflow: hidden; }
+.insight-bar-fill { height: 100%; border-radius: 4px; position: absolute; top: 0; }
+.insight-value { flex: 0 0 60px; text-align: right; font-size: 12px; font-variant-numeric: tabular-nums; color: var(--text-secondary); }
+
+.dashboard-footer { text-align: center; font-size: 12px; color: var(--text-secondary); padding: 16px 0; }
+
+@media (max-width: 900px) {
+    .chart-row { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+    .dashboard-header { flex-direction: column; align-items: flex-start; }
+    .kpi-row { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+<div class="dashboard-container">
+    <header class="dashboard-header">
+        <div>
+            <h1>NCAA Women's Volleyball — 2025 Season</h1>
+            <p>Power 4 conferences (ACC · Big 12 · Big Ten · SEC)</p>
+        </div>
+        <div class="filters">
+            <div class="filter-group">
+                <label for="filter-conference">Conference</label>
+                <select id="filter-conference" onchange="dashboard.applyFilters()">
+                    <option value="all">All Conferences</option>
+                    <option value="ACC">ACC</option>
+                    <option value="Big 12">Big 12</option>
+                    <option value="Big Ten">Big Ten</option>
+                    <option value="SEC">SEC</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <section class="kpi-row">
+        <div class="kpi-card">
+            <div class="kpi-label">Matches (Full Season)</div>
+            <div class="kpi-value" id="kpi-matches">—</div>
+            <div class="kpi-sub" id="kpi-date-range"></div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Power 4 Programs</div>
+            <div class="kpi-value" id="kpi-teams">—</div>
+            <div class="kpi-sub">ACC · Big 12 · Big Ten · SEC</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">League Avg Hitting %</div>
+            <div class="kpi-value" id="kpi-hitpct">—</div>
+            <div class="kpi-sub">mean of team season averages</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Teams Shown</div>
+            <div class="kpi-value" id="kpi-filtered-count">—</div>
+            <div class="kpi-sub" id="kpi-filtered-sub">current filter</div>
+        </div>
+    </section>
+
+    <section class="chart-row">
+        <div class="chart-container">
+            <div class="chart-header-row">
+                <div>
+                    <h3>Season Trend</h3>
+                    <div class="chart-sub">One stat, one team, across the season</div>
+                </div>
+                <div class="inline-filters">
+                    <select id="trend-team"></select>
+                    <select id="trend-stat">
+                        <option value="hit_pct">Hitting %</option>
+                        <option value="kills_per_set">Kills / Set</option>
+                        <option value="digs_per_set">Digs / Set</option>
+                        <option value="blocks_per_set">Blocks / Set</option>
+                        <option value="aces_per_set">Aces / Set</option>
+                        <option value="error_pct">Error %</option>
+                    </select>
+                </div>
+            </div>
+            <canvas id="trend-chart"></canvas>
+        </div>
+        <div class="chart-container">
+            <h3>Avg Win % by Conference</h3>
+            <div class="chart-sub">Mean across each conference's teams</div>
+            <canvas id="conf-chart"></canvas>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>Conference Standings</h2>
+        <div class="standings-grid" id="standings-grid"></div>
+    </section>
+
+    <section class="section">
+        <h2>Stat Leaderboard</h2>
+        <div id="leaderboard-table"></div>
+    </section>
+
+    <section class="section">
+        <div class="chart-header-row">
+            <h2>Player Leaderboard</h2>
+            <div class="inline-filters">
+                <select id="player-team-filter"><option value="all">All Teams</option></select>
+                <select id="player-position-filter">
+                    <option value="all">All Positions</option>
+                    <option value="OH">Outside Hitter (OH)</option>
+                    <option value="MB">Middle Blocker (MB)</option>
+                    <option value="OPP">Opposite (OPP)</option>
+                    <option value="S">Setter (S)</option>
+                    <option value="L">Libero (L)</option>
+                    <option value="L/DS">Libero/DS (L/DS)</option>
+                    <option value="DS">Defensive Specialist (DS)</option>
+                </select>
+                <label style="font-size:12px; display:flex; align-items:center; gap:4px;">
+                    <input type="checkbox" id="player-qualified-only" checked>
+                    Qualified only (30+ sets played)
+                </label>
+            </div>
+        </div>
+        <div class="player-leaders-row" id="player-leaders-row"></div>
+        <div id="player-table"></div>
+    </section>
+
+    <section class="section">
+        <h2>What Predicts Winning?</h2>
+        <div class="chart-sub" style="margin-bottom:14px;">
+            Pearson correlation between each team-match stat and match outcome, across all 2,546 team-match rows.
+        </div>
+        <div id="insights-list"></div>
+    </section>
+
+    <footer class="dashboard-footer">
+        Data: stats.ncaa.org, scraped and normalized in this repo. Not affiliated with or endorsed by the NCAA.
+    </footer>
+</div>
+
+<script>
+const DASHBOARD_DATA = /*__DASHBOARD_DATA__*/;
+
+const CONF_COLORS = { 'ACC': '#4C72B0', 'Big 12': '#DD8452', 'Big Ten': '#55A868', 'SEC': '#C44E52' };
+
+function pct(v, digits = 1) { return v == null ? '—' : (v * 100).toFixed(digits) + '%'; }
+function num(v, digits = 2) { return v == null ? '—' : v.toFixed(digits); }
+
+class Dashboard {
+    constructor(data) {
+        this.data = data;
+        this.charts = {};
+        this.init();
+    }
+
+    init() {
+        this.populateTeamDropdown();
+        this.populatePlayerTeamDropdown();
+        this.renderKPIs();
+        this.renderTrendChart();
+        this.renderConferenceChart();
+        this.renderStandings();
+        this.renderLeaderboard();
+        this.renderPlayers();
+        this.renderInsights();
+
+        document.getElementById('trend-team').addEventListener('change', () => this.renderTrendChart());
+        document.getElementById('trend-stat').addEventListener('change', () => this.renderTrendChart());
+        ['player-team-filter', 'player-position-filter', 'player-qualified-only'].forEach(id => {
+            document.getElementById(id).addEventListener('change', () => this.renderPlayers());
+        });
+    }
+
+    populatePlayerTeamDropdown() {
+        const select = document.getElementById('player-team-filter');
+        const byConf = {};
+        this.data.teams.forEach(t => { (byConf[t.conference] ||= []).push(t); });
+        Object.keys(byConf).sort().forEach(conf => {
+            const group = document.createElement('optgroup');
+            group.label = conf;
+            byConf[conf].forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t.team_id;
+                opt.textContent = t.name;
+                group.appendChild(opt);
+            });
+            select.appendChild(group);
+        });
+    }
+
+    populateTeamDropdown() {
+        const select = document.getElementById('trend-team');
+        const byConf = {};
+        this.data.teams.forEach(t => { (byConf[t.conference] ||= []).push(t); });
+        Object.keys(byConf).sort().forEach(conf => {
+            const group = document.createElement('optgroup');
+            group.label = conf;
+            byConf[conf].forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t.team_id;
+                opt.textContent = t.name;
+                group.appendChild(opt);
+            });
+            select.appendChild(group);
+        });
+        // Default to the top team by win_pct.
+        select.value = this.data.standings[0].team_id;
+    }
+
+    getConferenceFilter() {
+        const v = document.getElementById('filter-conference').value;
+        return v === 'all' ? null : v;
+    }
+
+    applyFilters() {
+        this.renderKPIs();
+        this.renderConferenceChart();
+        this.renderStandings();
+        this.renderLeaderboard();
+        this.renderPlayers();
+    }
+
+    renderKPIs() {
+        const m = this.data.meta;
+        document.getElementById('kpi-matches').textContent = m.n_matches.toLocaleString();
+        document.getElementById('kpi-date-range').textContent = `${m.start_date} to ${m.end_date}`;
+        document.getElementById('kpi-teams').textContent = m.n_teams;
+        document.getElementById('kpi-hitpct').textContent = pct(m.league_avg_hit_pct);
+
+        const conf = this.getConferenceFilter();
+        const filtered = conf ? this.data.standings.filter(s => s.conference === conf) : this.data.standings;
+        document.getElementById('kpi-filtered-count').textContent = filtered.length;
+        document.getElementById('kpi-filtered-sub').textContent = conf || 'all conferences';
+    }
+
+    renderTrendChart() {
+        const teamId = document.getElementById('trend-team').value;
+        const stat = document.getElementById('trend-stat').value;
+        const rows = this.data.trends.filter(r => r.team_id === teamId);
+        const team = this.data.teams.find(t => t.team_id === teamId);
+
+        const labels = rows.map(r => r.date.slice(0, 10));
+        const values = rows.map(r => r[stat]);
+        const pointColors = rows.map(r => r.won ? '#28a745' : '#dc3545');
+
+        if (this.charts.trend) this.charts.trend.destroy();
+        const ctx = document.getElementById('trend-chart').getContext('2d');
+        this.charts.trend = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [{
+                    label: team ? team.name : '',
+                    data: values,
+                    borderColor: CONF_COLORS[team?.conference] || '#4C72B0',
+                    backgroundColor: (CONF_COLORS[team?.conference] || '#4C72B0') + '20',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.25,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: pointColors,
+                }],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            afterLabel: (ctx) => {
+                                const r = rows[ctx.dataIndex];
+                                return `${r.won ? 'W' : 'L'} vs ${r.opponent_name}`;
+                            },
+                        },
+                    },
+                },
+                scales: {
+                    x: { grid: { display: false } },
+                    y: { beginAtZero: stat !== 'hit_pct' && stat !== 'error_pct' },
+                },
+            },
+        });
+    }
+
+    renderConferenceChart() {
+        const confs = ['ACC', 'Big 12', 'Big Ten', 'SEC'];
+        const avgWinPct = confs.map(c => {
+            const rows = this.data.standings.filter(s => s.conference === c);
+            return rows.reduce((sum, r) => sum + r.win_pct, 0) / rows.length;
+        });
+
+        if (this.charts.conf) this.charts.conf.destroy();
+        const ctx = document.getElementById('conf-chart').getContext('2d');
+        this.charts.conf = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: confs,
+                datasets: [{
+                    data: avgWinPct,
+                    backgroundColor: confs.map(c => CONF_COLORS[c]),
+                    borderRadius: 4,
+                }],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: (ctx) => pct(ctx.parsed.y) } },
+                },
+                scales: {
+                    y: { beginAtZero: true, max: 1, ticks: { callback: (v) => pct(v, 0) } },
+                },
+            },
+        });
+    }
+
+    renderStandings() {
+        const conf = this.getConferenceFilter();
+        const confs = conf ? [conf] : ['ACC', 'Big 12', 'Big Ten', 'SEC'];
+        const grid = document.getElementById('standings-grid');
+        grid.innerHTML = '';
+
+        confs.forEach(c => {
+            const rows = this.data.standings
+                .filter(s => s.conference === c)
+                .sort((a, b) => b.win_pct - a.win_pct);
+
+            const group = document.createElement('div');
+            group.className = 'standings-group';
+            group.style.setProperty('--conf-color', CONF_COLORS[c]);
+
+            let html = `<h4>${c}</h4><table class="data-table"><thead><tr>
+                <th>Team</th><th>W</th><th>L</th><th>Win%</th></tr></thead><tbody>`;
+            rows.forEach(r => {
+                html += `<tr><td>${r.name}</td><td>${r.wins}</td><td>${r.losses}</td><td>${pct(r.win_pct)}</td></tr>`;
+            });
+            html += '</tbody></table>';
+            group.innerHTML = html;
+            grid.appendChild(group);
+        });
+    }
+
+    renderLeaderboard() {
+        const conf = this.getConferenceFilter();
+        const rows = conf ? this.data.standings.filter(s => s.conference === conf) : this.data.standings;
+
+        const columns = [
+            { field: 'name', label: 'Team', fmt: (v) => v },
+            { field: 'conference', label: 'Conf', fmt: (v) => `<span class="conf-tag" style="background:${CONF_COLORS[v]}">${v}</span>` },
+            { field: 'wins', label: 'W', fmt: (v) => v },
+            { field: 'losses', label: 'L', fmt: (v) => v },
+            { field: 'win_pct', label: 'Win%', fmt: pct },
+            { field: 'avg_hit_pct', label: 'Hit%', fmt: pct },
+            { field: 'kills_per_set', label: 'K/Set', fmt: num },
+            { field: 'digs_per_set', label: 'D/Set', fmt: num },
+            { field: 'blocks_per_set', label: 'B/Set', fmt: num },
+            { field: 'aces_per_set', label: 'A/Set', fmt: num },
+            { field: 'strength_of_schedule', label: 'SOS', fmt: pct },
+        ];
+
+        let sortField = 'win_pct', sortDir = 'desc';
+
+        const render = () => {
+            const sorted = [...rows].sort((a, b) => {
+                const av = a[sortField], bv = b[sortField];
+                const cmp = typeof av === 'string' ? av.localeCompare(bv) : av - bv;
+                return sortDir === 'asc' ? cmp : -cmp;
+            });
+            let html = '<table class="data-table"><thead><tr>';
+            columns.forEach(col => {
+                const arrow = sortField === col.field ? (sortDir === 'asc' ? ' ▲' : ' ▼') : '';
+                html += `<th data-field="${col.field}">${col.label}${arrow}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+            sorted.forEach(r => {
+                html += '<tr>' + columns.map(c => `<td>${c.fmt(r[c.field])}</td>`).join('') + '</tr>';
+            });
+            html += '</tbody></table>';
+            const container = document.getElementById('leaderboard-table');
+            container.innerHTML = html;
+            container.querySelectorAll('th').forEach(th => {
+                th.addEventListener('click', () => {
+                    const field = th.dataset.field;
+                    if (sortField === field) sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+                    else { sortField = field; sortDir = 'desc'; }
+                    render();
+                });
+            });
+        };
+        render();
+    }
+
+    getFilteredPlayers() {
+        const conf = this.getConferenceFilter();
+        const team = document.getElementById('player-team-filter').value;
+        const position = document.getElementById('player-position-filter').value;
+        const qualifiedOnly = document.getElementById('player-qualified-only').checked;
+
+        return this.data.players.filter(p => {
+            if (conf && p.conference !== conf) return false;
+            if (team !== 'all' && p.team_id !== team) return false;
+            if (position !== 'all' && p.position !== position) return false;
+            if (qualifiedOnly && p.sets_played < 30) return false;
+            return true;
+        });
+    }
+
+    renderPlayers() {
+        const players = this.getFilteredPlayers();
+
+        const leaders = [
+            { stat: 'kills', label: 'Kills', fmt: (v) => v },
+            { stat: 'digs', label: 'Digs', fmt: (v) => v },
+            { stat: 'blocks', label: 'Blocks', fmt: (v) => v },
+            { stat: 'aces', label: 'Aces', fmt: (v) => v },
+            { stat: 'assists', label: 'Assists', fmt: (v) => v },
+            { stat: 'hit_pct', label: 'Hitting % (qualified)', fmt: pct, requireQualified: true },
+        ];
+        const leadersRow = document.getElementById('player-leaders-row');
+        leadersRow.innerHTML = leaders.map(l => {
+            const pool = l.requireQualified
+                ? players.filter(p => p.sets_played >= 30 && p.total_attacks >= 50)
+                : players;
+            if (!pool.length) return `<div class="leader-card"><div class="leader-stat">${l.label}</div><div class="leader-name">—</div></div>`;
+            const top = pool.reduce((a, b) => (b[l.stat] > a[l.stat] ? b : a));
+            return `<div class="leader-card">
+                <div class="leader-stat">${l.label}</div>
+                <div class="leader-name">${top.name}</div>
+                <div class="leader-detail">${l.fmt(top[l.stat])} · ${top.team_name}</div>
+            </div>`;
+        }).join('');
+
+        const columns = [
+            { field: 'name', label: 'Name', fmt: (v) => v },
+            { field: 'team_name', label: 'Team', fmt: (v) => v },
+            { field: 'position', label: 'Pos', fmt: (v) => v || '—' },
+            { field: 'sets_played', label: 'Sets', fmt: (v) => v },
+            { field: 'kills', label: 'Kills', fmt: (v) => v },
+            { field: 'kills_per_set', label: 'K/Set', fmt: num },
+            { field: 'hit_pct', label: 'Hit%', fmt: (v, row) => row.total_attacks >= 50 ? pct(v) : '—' },
+            { field: 'digs', label: 'Digs', fmt: (v) => v },
+            { field: 'digs_per_set', label: 'D/Set', fmt: num },
+            { field: 'blocks', label: 'Blocks', fmt: (v) => v },
+            { field: 'blocks_per_set', label: 'B/Set', fmt: num },
+            { field: 'aces', label: 'Aces', fmt: (v) => v },
+            { field: 'assists', label: 'Assists', fmt: (v) => v },
+            { field: 'points', label: 'Pts', fmt: (v) => num(v, 1) },
+        ];
+        let sortField = 'kills', sortDir = 'desc';
+
+        // Sorting by hit_pct treats low-attack-volume players (same threshold
+        // as the displayed '—') as unranked rather than letting a fluke
+        // small-sample hit_pct (e.g. 1-for-1) sort to the top.
+        const sortKey = (p) => (sortField === 'hit_pct' && p.total_attacks < 50) ? null : p[sortField];
+
+        const render = () => {
+            const sorted = [...players].sort((a, b) => {
+                const av = sortKey(a), bv = sortKey(b);
+                if (av == null && bv == null) return 0;
+                if (av == null) return 1;
+                if (bv == null) return -1;
+                const cmp = typeof av === 'string' ? av.localeCompare(bv) : av - bv;
+                return sortDir === 'asc' ? cmp : -cmp;
+            }).slice(0, 200);
+
+            let html = `<table class="data-table"><thead><tr>`;
+            columns.forEach(col => {
+                const arrow = sortField === col.field ? (sortDir === 'asc' ? ' ▲' : ' ▼') : '';
+                html += `<th data-field="${col.field}">${col.label}${arrow}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+            sorted.forEach(p => {
+                html += '<tr>' + columns.map(c => `<td>${c.fmt(p[c.field], p)}</td>`).join('') + '</tr>';
+            });
+            html += '</tbody></table>';
+            if (players.length > 200) {
+                html += `<div class="chart-sub" style="margin-top:8px;">Showing top 200 of ${players.length} matching players (sorted by ${sortField}).</div>`;
+            }
+            const container = document.getElementById('player-table');
+            container.innerHTML = html;
+            container.querySelectorAll('th').forEach(th => {
+                th.addEventListener('click', () => {
+                    const field = th.dataset.field;
+                    if (sortField === field) sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+                    else { sortField = field; sortDir = 'desc'; }
+                    render();
+                });
+            });
+        };
+        render();
+    }
+
+    renderInsights() {
+        const rows = this.data.correlations;
+        const maxAbs = Math.max(...rows.map(r => Math.abs(r.correlation)));
+        const container = document.getElementById('insights-list');
+        container.innerHTML = rows.map(r => {
+            const widthPct = (Math.abs(r.correlation) / maxAbs) * 100;
+            const color = r.correlation >= 0 ? '#28a745' : '#dc3545';
+            const side = r.correlation >= 0 ? 'left: 50%;' : `right: 50%;`;
+            return `<div class="insight-row">
+                <div class="insight-label">${r.label}</div>
+                <div class="insight-bar-track">
+                    <div class="insight-bar-fill" style="width:${widthPct / 2}%; ${side} background:${color};"></div>
+                </div>
+                <div class="insight-value">${r.correlation >= 0 ? '+' : ''}${r.correlation.toFixed(3)}</div>
+            </div>`;
+        }).join('');
+    }
+}
+
+const dashboard = new Dashboard(DASHBOARD_DATA);
+</script>
+</body>
+</html>
